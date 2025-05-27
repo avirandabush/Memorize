@@ -22,40 +22,13 @@ struct EmojiMemoryGameView: View {
     }
     
     var cards: some View {
-        GeometryReader { geometry in
-            let aspectRatio: CGFloat = 2/3
-            let gridItemSize = scaleForSize(count: CGFloat(viewModel.cards.count),
-                                            size: geometry.size,
-                                            aspectRatio: aspectRatio)
-            
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize), spacing: 0)], spacing: 0) {
-                ForEach(viewModel.cards) { card in
-                    CardView(card)
-                        .aspectRatio(aspectRatio, contentMode: .fit)
-                        .padding(4)
-                        .onTapGesture {
-                            viewModel.choose(card)
-                        }
+        AspectVGrid(for: viewModel.cards, aspectRatio: 2/3) { card in
+            CardView(card)
+                .padding(4)
+                .onTapGesture {
+                    viewModel.choose(card)
                 }
-            }
         }
-    }
-    
-    func scaleForSize(count: CGFloat, size: CGSize, aspectRatio: CGFloat) -> CGFloat {
-        var columnCount = 1.0
-        
-        repeat {
-            let width = size.width / columnCount
-            let height = width / aspectRatio
-            let rowCount = ceil(count / columnCount)
-            
-            if rowCount * height < size.height {
-                return floor(size.width / columnCount)
-            }
-            columnCount += 1
-        } while columnCount < count
-        
-        return floor(min(size.width / count, size.height * aspectRatio))
     }
 }
 
@@ -89,6 +62,8 @@ struct CardView: View {
         .foregroundStyle(Color(.cyan))
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     EmojiMemoryGameView(viewModel: EmojiMemoryGame())
